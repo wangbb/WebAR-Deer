@@ -9,12 +9,51 @@
     <script src="https://raw.githack.com/donmccurdy/aframe-extras/master/dist/aframe-extras.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
+
+        /* Custom Loading Screen Styles (Optional) */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* 半透明黑色背景 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5em;
+            font-family: sans-serif;
+            z-index: 9999;
+            flex-direction: column; /* 讓文字和進度條垂直排列 */
+        }
+        #loadingProgress {
+            margin-top: 20px;
+            width: 80%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            height: 20px; /* 進度條高度 */
+        }
+        #loadingProgressBar {
+            height: 100%;
+            background-color: #4CAF50; /* 進度條顏色 */
+            width: 0%; /* 初始寬度 */
+            transition: width 0.1s linear; /* 平滑過渡 */
+        }
     </style>
 </head>
 <body>
-    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-        <a-assets>
-            <a-asset-item id="elk-model" src="models/low_poly_stylish_ma_0607140326_texture.glb"></a-asset-item>
+    <div id="loadingOverlay" style="display: flex;">
+        <p>載入中... 請稍候</p>
+        <div id="loadingProgress">
+            <div id="loadingProgressBar"></div>
+        </div>
+        <p><span id="loadingPercentage">0</span>%</p>
+    </div>
+
+    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'
+             loading-screen="enabled: false;"  > <a-assets timeout="100000"> <a-asset-item id="elk-model" src="models/deer.glb"></a-asset-item>
         </a-assets>
 
         <a-marker type='pattern' url='markers/pattern-deer.patt'>
@@ -29,5 +68,37 @@
 
         <a-entity camera></a-entity>
     </a-scene>
+
+    <script>
+        // JavaScript 來更新載入進度
+        document.addEventListener('DOMContentLoaded', () => {
+            const scene = document.querySelector('a-scene');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const progressBar = document.getElementById('loadingProgressBar');
+            const percentageText = document.getElementById('loadingPercentage');
+
+            // 監聽 A-Frame 資產載入進度
+            scene.addEventListener('loaded', () => {
+                // 當所有資產載入完成，隱藏載入畫面
+                loadingOverlay.style.display = 'none';
+            });
+
+            scene.addEventListener('progress', (evt) => {
+                // evt.detail.loaded: 已載入的資源數
+                // evt.detail.total: 總資源數
+                // evt.detail.progress: 0-100 的進度百分比 (較適用於單一大檔案)
+
+                if (evt.detail.loaded && evt.detail.total) {
+                    const progress = (evt.detail.loaded / evt.detail.total) * 100;
+                    progressBar.style.width = progress + '%';
+                    percentageText.textContent = Math.round(progress);
+                } else if (evt.detail.progress !== undefined) {
+                    // 對於個別資源的進度，A-Frame 有時只提供這個
+                    progressBar.style.width = evt.detail.progress + '%';
+                    percentageText.textContent = Math.round(evt.detail.progress);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
