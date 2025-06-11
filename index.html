@@ -64,33 +64,26 @@
             <a-asset-item id="elk-model" src="models/deer.glb"></a-asset-item>
         </a-assets>
 
-        <a-image-target preset="custom" url="nft-markers/pattern-deer.fset">
-            <a-text value="圖片辨識成功！"
-                     position="0 0.5 0"
-                     rotation="-90 0 0"
-                     width="2"
-                     align="center"
-                     color="white"
-                     background="blue"
-                     wrap-count="15">
-            </a-text>
-
-            <a-box position="0 0.2 0"
-                   rotation="0 45 0"
-                   color="#4CC3D9"
-                   depth="0.2"
-                   height="0.2"
-                   width="0.2">
-            </a-box>
-
-            <a-entity
-                gltf-model="#elk-model"
-                scale="0.1 0.1 0.1"
-                position="0 0 0"
-                rotation="0 0 0"
-                animation-mixer="clip: *; loop: repeat"
+        <a-marker
+                id="animated-marker"
+                type="pattern"
+                preset="custom"
+                url="assets/marker.patt"
+                raycaster="objects: .clickable"
+                emitevents="true"
+                cursor="fuse: false; rayOrigin: mouse;"
+                id="markerA"
+            >
+                <a-entity
+                    id="bowser-model"
+                    scale="0.9983527421588635 0.9983527421588635 0.9983527421588635"
+                    animation-mixer="loop: repeat"
+                    gltf-model="#elk-model"
+                    class="clickable"
+                    gesture-handler
                 ></a-entity>
-        </a-image-target>
+            </a-marker>
+
 
         <a-entity camera></a-entity>
     </a-scene>
